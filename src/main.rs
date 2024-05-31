@@ -2,7 +2,8 @@ mod physics;
 mod vector_2d;
 mod ball;
 
-use std::future::Future;
+use std::sync::{Arc, Mutex};
+use std::thread;
 use std::time::{Duration, Instant};
 use macroquad::prelude::*;
 use crate::ball::Ball;
@@ -12,13 +13,14 @@ use crate::vector_2d::Vector2D;
 #[macroquad::main("2D Simulation")]
 async fn main() {
     let frames_controller = FramesLimiter::new(60);
-    let mut experiment = Experiment::new();
-    experiment.balls.push(Ball::new(Vector2D { x: 500.0, y: 200.0 }, 10.0));
+    let mut experiment = Arc::new(Mutex::new(Experiment::new()));
+
+    start_spawning_balls(&mut experiment);
 
     loop {
         frames_controller.control_frame(|| {
             clear_background(BLACK);
-
+            let mut experiment = experiment.lock().unwrap();
             experiment.update(get_frame_time());
 
             experiment.balls.iter().for_each(|ball| {
@@ -28,6 +30,23 @@ async fn main() {
 
         next_frame().await
     }
+}
+
+fn start_spawning_balls(experiment: &mut Arc<Mutex<Experiment>>) {
+    let experiment_clone = experiment.clone();
+
+    thread::spawn(move || {
+        let ball_start_position = Vector2D { x: 500.0, y: 200.0 };
+
+        loop {
+            {
+                let mut experiment = experiment_clone.lock().unwrap();
+                experiment.balls.push(Ball::new(ball_start_position, 10.0));
+            }
+
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
 }
 
 pub struct FramesLimiter {
@@ -55,7 +74,7 @@ impl FramesLimiter {
         }
 
         let nanos_left = self.min_frame_time_in_nanoseconds - elapsed.as_nanos();
-        std::thread::sleep(Duration::from_nanos(nanos_left as u64));
+        thread::sleep(Duration::from_nanos(nanos_left as u64));
 
         println!("elapsed: {}", start.elapsed().as_nanos());
     }
