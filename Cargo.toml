@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 macroquad = "0.4.7"
 minifb = "0.27.0"
-raqote = "0.8.4"
+rand = "0.8.5"
