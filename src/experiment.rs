@@ -1,4 +1,5 @@
 use crate::ball::Ball;
+use crate::collisions::calculate_postcollision_positions;
 use crate::constraints::Constraint;
 use crate::point_2d::Point2D;
 
@@ -11,7 +12,7 @@ pub struct Experiment {
 impl Experiment {
     pub fn new(constraint: Option<Box<dyn Constraint + Send + Sync>>) -> Self {
         Self {
-            gravity: Point2D { x: 0.0, y: 1000.0 },
+            gravity: Point2D { x: 0.0, y: 500.0 },
             balls: vec![],
             constraint,
         }
@@ -20,6 +21,7 @@ impl Experiment {
     pub fn update(&mut self, dt: f32) {
         self.apply_gravity();
         self.apply_constraint();
+        self.handle_collisions();
         self.update_positions(dt);
     }
 
@@ -52,4 +54,29 @@ impl Experiment {
             ball.verlet_object.position_current = new_position.unwrap();
         })
     }
+
+    fn handle_collisions(&mut self) {
+        let len = self.balls.len();
+
+        for i in 0..len {
+            for j in i+1..len {
+
+                let (ball_1, ball_2) = get_two_mut(&mut self.balls, i, j);
+                let postcollision_positions = calculate_postcollision_positions(ball_1, ball_2);
+
+                if postcollision_positions.is_none() {
+                    continue;
+                }
+
+                ball_1.verlet_object.position_current = postcollision_positions.unwrap().0;
+                ball_2.verlet_object.position_current = postcollision_positions.unwrap().1;
+            }
+        }
+    }
+
+}
+
+fn get_two_mut<T>(slice: &mut [T], i: usize, j: usize) -> (&mut T, &mut T) {
+    let (left, right) = slice.split_at_mut(j);
+    (&mut left[i], &mut right[0])
 }

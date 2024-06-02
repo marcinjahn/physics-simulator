@@ -5,6 +5,7 @@ mod renderer;
 mod constraints;
 mod verlet_object;
 mod vector_2d;
+mod collisions;
 
 use crate::point_2d::Point2D;
 use macroquad::prelude::*;
@@ -18,9 +19,19 @@ use crate::constraints::CircularConstraint;
 use crate::experiment::Experiment;
 use crate::renderer::Renderer;
 
+// SETTINGS
+const FRAME_RATE: u32 = 60;
+const BALL_RADIUS: f32 = 40.;
+const MAX_BALLS_COUNT: usize = 2;
+const BALL_START_X: f32 = 700.;
+const BALL_START_Y: f32 = 500.;
+const BALL_SPAWN_DELAY_MS: u64 = 1000;
+
+
+
 #[macroquad::main(window_conf)]
 async fn main() {
-    let frames_controller = FramesLimiter::new(60);
+    let frames_controller = FramesLimiter::new(FRAME_RATE);
     let mut experiment = Arc::new(Mutex::new(Experiment::new(Some(Box::new(
         CircularConstraint::new(Point2D { x: 500.0, y: 500.0 }, 300.0),
     )))));
@@ -49,15 +60,19 @@ fn start_spawning_balls(experiment: &mut Arc<Mutex<Experiment>>) {
     let experiment_clone = experiment.clone();
 
     thread::spawn(move || {
-        let ball_start_position = Point2D { x: 600.0, y: 500.0 };
+        let ball_start_position = Point2D { x: BALL_START_X, y: BALL_START_Y };
 
         loop {
             {
                 let mut experiment = experiment_clone.lock().unwrap();
-                experiment.balls.push(Ball::new(ball_start_position, 20.0, get_random_color()));
+                experiment.balls.push(Ball::new(ball_start_position, BALL_RADIUS, get_random_color()));
+
+                if experiment.balls.len() >= MAX_BALLS_COUNT {
+                    break;
+                }
             }
 
-            thread::sleep(Duration::from_secs(1));
+            thread::sleep(Duration::from_millis(BALL_SPAWN_DELAY_MS));
         }
     });
 }

@@ -16,9 +16,9 @@ impl VerletObject {
     }
 
     pub(crate) fn update_position(&mut self, dt: f32) {
-        let velocity = self.position_current - self.position_old;
+        let translation= self.position_current - self.position_old; // should be a Vector2D
         self.position_old = self.position_current;
-        self.position_current = self.position_current + velocity + self.acceleration * dt * dt;
+        self.position_current = self.position_current + translation + self.acceleration * (dt * dt);
 
         self.acceleration = Point2D { x: 0.0, y: 0.0 }
     }
