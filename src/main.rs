@@ -1,11 +1,11 @@
 mod ball;
-mod physics;
+mod experiment;
 mod point_2d;
 mod renderer;
+mod constraints;
+mod verlet_object;
+mod vector_2d;
 
-use std::ops::Range;
-use crate::ball::Ball;
-use crate::physics::{CircularConstraint, Experiment};
 use crate::point_2d::Point2D;
 use macroquad::prelude::*;
 use std::sync::{Arc, Mutex};
@@ -13,6 +13,9 @@ use std::thread;
 use std::time::{Duration, Instant};
 use ::rand;
 use rand::{Rng, thread_rng};
+use crate::ball::Ball;
+use crate::constraints::CircularConstraint;
+use crate::experiment::Experiment;
 use crate::renderer::Renderer;
 
 #[macroquad::main(window_conf)]

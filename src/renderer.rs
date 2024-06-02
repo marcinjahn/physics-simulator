@@ -1,6 +1,6 @@
-use macroquad::color::{BLACK, BLUE};
+use macroquad::color::{BLACK, };
 use macroquad::prelude::{clear_background, draw_circle};
-use crate::physics::Experiment;
+use crate::experiment::Experiment;
 
 pub struct Renderer<'a> {
     pub experiment: &'a Experiment

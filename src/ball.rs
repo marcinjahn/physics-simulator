@@ -1,6 +1,6 @@
 use macroquad::color::Color;
-use crate::physics::VerletObject;
 use crate::point_2d::Point2D;
+use crate::verlet_object::VerletObject;
 
 pub struct Ball {
     pub verlet_object: VerletObject,
@@ -17,9 +17,3 @@ impl Ball {
         }
     }
 }
-
-//impl Ball {
-//    fn update(nanoseconds_passed: u32) {
-//
-//    }
-//}
