@@ -22,10 +22,10 @@ use crate::renderer::Renderer;
 // SETTINGS
 const FRAME_RATE: u32 = 60;
 const BALL_RADIUS: f32 = 40.;
-const MAX_BALLS_COUNT: usize = 10;
+const MAX_BALLS_COUNT: usize = 2;
 const BALL_START_X: f32 = 700.;
-const BALL_START_Y: f32 = 500.;
-const BALL_SPAWN_DELAY_MS: u64 = 1000;
+const BALL_START_Y: f32 = 400.;
+const BALL_SPAWN_DELAY_MS: u64 = 100;
 
 
 
@@ -39,11 +39,12 @@ async fn main() {
     start_spawning_balls(&mut experiment);
 
     let mut frame_counter = 0;
+    let frame_time = 1. / FRAME_RATE as f32;
     loop {
         frames_controller.control_frame(|| {
             let mut experiment = experiment.lock().unwrap();
 
-            experiment.update(get_frame_time());
+            experiment.update(frame_time);
 
             let renderer = Renderer { experiment: &experiment, render_ball_ids: true };
             renderer.render();
