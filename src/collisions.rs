@@ -20,7 +20,7 @@ pub fn calculate_postcollision_positions(mut ball_1: &Ball, mut ball_2: &Ball) -
         },
         Point2D {
             x: ball_2.verlet_object.position_current.x + normalized_vector.x * half_delta,
-            y: ball_2.verlet_object.position_current.y + normalized_vector.y + half_delta
+            y: ball_2.verlet_object.position_current.y + normalized_vector.y * half_delta
         }
     ))
 }
