@@ -15,6 +15,10 @@ impl Point2D {
     pub fn vector_to(&self, other: &Point2D) -> Vector2D {
         Vector2D::new(other.x - self.x, other.y - self.y)
     }
+
+    pub fn as_vector(&self) -> Vector2D {
+        Vector2D::new(self.x, self.y)
+    }
 }
 
 impl ops::Add<Point2D> for Point2D {
@@ -24,6 +28,17 @@ impl ops::Add<Point2D> for Point2D {
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
+        }
+    }
+}
+
+impl ops::Add<Vector2D> for Point2D {
+    type Output = Point2D;
+
+    fn add(self, rhs: Vector2D) -> Self {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y
         }
     }
 }
