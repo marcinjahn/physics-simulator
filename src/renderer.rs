@@ -1,18 +1,21 @@
+use crate::experiment::Experiment;
 use macroquad::color::{BLACK, WHITE};
 use macroquad::prelude::{clear_background, draw_circle};
 use macroquad::text::draw_text;
-use crate::experiment::Experiment;
 
 pub struct Renderer<'a> {
     pub experiment: &'a Experiment,
-    pub render_ball_ids: bool
+    pub render_ball_ids: bool,
 }
 
 impl Renderer<'_> {
     pub fn render(&self) {
         clear_background(BLACK);
 
-        self.experiment.constraint.as_ref().map(|constraint| constraint.render());
+        self.experiment
+            .constraint
+            .as_ref()
+            .map(|constraint| constraint.render());
 
         self.experiment.balls.iter().for_each(|ball| {
             draw_circle(

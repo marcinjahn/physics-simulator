@@ -2,32 +2,38 @@ use crate::ball::Ball;
 use crate::collisions::calculate_postcollision_positions;
 use crate::constraints::Constraint;
 use crate::point_2d::Point2D;
+use std::time::Duration;
 
 pub struct Experiment {
     pub balls: Vec<Ball>,
     gravity: Point2D,
+    frame_time: Duration,
     pub(crate) constraint: Option<Box<dyn Constraint + Send + Sync>>,
 }
 
 impl Experiment {
-    pub fn new(constraint: Option<Box<dyn Constraint + Send + Sync>>) -> Self {
+    pub fn new(
+        frame_time: Duration,
+        constraint: Option<Box<dyn Constraint + Send + Sync>>,
+    ) -> Self {
         Self {
             gravity: Point2D { x: 0.0, y: 1000.0 },
             balls: vec![],
+            frame_time,
             constraint,
         }
     }
 
-    pub fn update(&mut self, dt: f32) {
+    pub fn update(&mut self) {
         self.apply_gravity();
         self.apply_constraint();
         self.handle_collisions();
-        self.update_positions(dt);
+        self.update_positions();
     }
 
-    fn update_positions(&mut self, dt: f32) {
+    fn update_positions(&mut self) {
         self.balls.iter_mut().for_each(|ball| {
-            ball.verlet_object.update_position(dt);
+            ball.verlet_object.update_position(self.frame_time);
         })
     }
 
@@ -59,8 +65,7 @@ impl Experiment {
         let len = self.balls.len();
 
         for i in 0..len {
-            for j in i+1..len {
-
+            for j in i + 1..len {
                 let (ball_1, ball_2) = get_two_mut(&mut self.balls, i, j);
                 let postcollision_positions = calculate_postcollision_positions(ball_1, ball_2);
 
@@ -73,7 +78,6 @@ impl Experiment {
             }
         }
     }
-
 }
 
 fn get_two_mut<T>(slice: &mut [T], i: usize, j: usize) -> (&mut T, &mut T) {

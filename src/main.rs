@@ -1,23 +1,23 @@
 mod ball;
+mod collisions;
+mod constraints;
 mod experiment;
 mod point_2d;
 mod renderer;
-mod constraints;
-mod verlet_object;
 mod vector_2d;
-mod collisions;
+mod verlet_object;
 
-use crate::point_2d::Point2D;
-use macroquad::prelude::*;
-use std::sync::{Arc, Mutex};
-use std::thread;
-use std::time::{Duration, Instant};
-use ::rand;
-use rand::{Rng, thread_rng};
 use crate::ball::Ball;
 use crate::constraints::CircularConstraint;
 use crate::experiment::Experiment;
+use crate::point_2d::Point2D;
 use crate::renderer::Renderer;
+use ::rand;
+use macroquad::prelude::*;
+use rand::{thread_rng, Rng};
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::{Duration, Instant};
 
 // SETTINGS
 const FRAME_RATE: u32 = 60;
@@ -27,26 +27,30 @@ const BALL_START_X: f32 = 700.;
 const BALL_START_Y: f32 = 400.;
 const BALL_SPAWN_DELAY_MS: u64 = 50;
 
-
-
 #[macroquad::main(window_conf)]
 async fn main() {
     let frames_controller = FramesLimiter::new(FRAME_RATE);
-    let mut experiment = Arc::new(Mutex::new(Experiment::new(Some(Box::new(
-        CircularConstraint::new(Point2D { x: 500.0, y: 500.0 }, 300.0),
-    )))));
+    let mut experiment = Arc::new(Mutex::new(Experiment::new(
+        Duration::from_secs_f32(1. / FRAME_RATE as f32),
+        Some(Box::new(CircularConstraint::new(
+            Point2D { x: 500.0, y: 500.0 },
+            300.0,
+        ))),
+    )));
 
     start_spawning_balls(&mut experiment);
 
     let mut frame_counter = 0;
-    let frame_time = 1. / FRAME_RATE as f32;
     loop {
         frames_controller.control_frame(|| {
             let mut experiment = experiment.lock().unwrap();
 
-            experiment.update(frame_time);
+            experiment.update();
 
-            let renderer = Renderer { experiment: &experiment, render_ball_ids: false };
+            let renderer = Renderer {
+                experiment: &experiment,
+                render_ball_ids: false,
+            };
             renderer.render();
         });
 
@@ -61,13 +65,21 @@ fn start_spawning_balls(experiment: &mut Arc<Mutex<Experiment>>) {
     let experiment_clone = experiment.clone();
 
     thread::spawn(move || {
-        let ball_start_position = Point2D { x: BALL_START_X, y: BALL_START_Y };
+        let ball_start_position = Point2D {
+            x: BALL_START_X,
+            y: BALL_START_Y,
+        };
 
         loop {
             {
                 let mut experiment = experiment_clone.lock().unwrap();
                 let id = experiment.balls.len();
-                experiment.balls.push(Ball::new(id as u32, ball_start_position, BALL_RADIUS, get_random_color()));
+                experiment.balls.push(Ball::new(
+                    id as u32,
+                    ball_start_position,
+                    BALL_RADIUS,
+                    get_random_color(),
+                ));
 
                 if experiment.balls.len() >= MAX_BALLS_COUNT {
                     break;

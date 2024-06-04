@@ -1,7 +1,7 @@
-use macroquad::color::WHITE;
-use macroquad::prelude::draw_poly;
 use crate::ball::Ball;
 use crate::point_2d::Point2D;
+use macroquad::color::WHITE;
+use macroquad::prelude::draw_poly;
 
 pub trait Constraint {
     fn render(&self);

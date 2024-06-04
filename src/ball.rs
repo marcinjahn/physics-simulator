@@ -1,6 +1,6 @@
-use macroquad::color::Color;
 use crate::point_2d::Point2D;
 use crate::verlet_object::VerletObject;
+use macroquad::color::Color;
 
 pub struct Ball {
     pub verlet_object: VerletObject,
@@ -15,7 +15,7 @@ impl Ball {
             verlet_object: VerletObject::new(position),
             radius,
             color,
-            id
+            id,
         }
     }
 }

@@ -1,5 +1,5 @@
-use std::ops;
 use crate::vector_2d::Vector2D;
+use std::ops;
 
 #[derive(Copy, Clone)]
 pub struct Point2D {
