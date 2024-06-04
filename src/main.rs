@@ -22,7 +22,7 @@ use crate::renderer::Renderer;
 // SETTINGS
 const FRAME_RATE: u32 = 60;
 const BALL_RADIUS: f32 = 40.;
-const MAX_BALLS_COUNT: usize = 2;
+const MAX_BALLS_COUNT: usize = 10;
 const BALL_START_X: f32 = 700.;
 const BALL_START_Y: f32 = 500.;
 const BALL_SPAWN_DELAY_MS: u64 = 1000;
@@ -45,7 +45,7 @@ async fn main() {
 
             experiment.update(get_frame_time());
 
-            let renderer = Renderer { experiment: &experiment };
+            let renderer = Renderer { experiment: &experiment, render_ball_ids: true };
             renderer.render();
         });
 
@@ -65,7 +65,8 @@ fn start_spawning_balls(experiment: &mut Arc<Mutex<Experiment>>) {
         loop {
             {
                 let mut experiment = experiment_clone.lock().unwrap();
-                experiment.balls.push(Ball::new(ball_start_position, BALL_RADIUS, get_random_color()));
+                let id = experiment.balls.len();
+                experiment.balls.push(Ball::new(id as u32, ball_start_position, BALL_RADIUS, get_random_color()));
 
                 if experiment.balls.len() >= MAX_BALLS_COUNT {
                     break;

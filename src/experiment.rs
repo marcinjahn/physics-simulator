@@ -12,7 +12,7 @@ pub struct Experiment {
 impl Experiment {
     pub fn new(constraint: Option<Box<dyn Constraint + Send + Sync>>) -> Self {
         Self {
-            gravity: Point2D { x: 0.0, y: 500.0 },
+            gravity: Point2D { x: 0.0, y: 1000.0 },
             balls: vec![],
             constraint,
         }
