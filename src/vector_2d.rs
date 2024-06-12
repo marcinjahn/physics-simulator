@@ -1,3 +1,5 @@
+use std::ops::Mul;
+
 pub struct Vector2D {
     pub x: f32,
     pub y: f32,
@@ -23,5 +25,13 @@ impl Vector2D {
             y: self.y / self.length,
             length: 1.0,
         }
+    }
+}
+
+impl Mul<f32> for Vector2D {
+    type Output = Vector2D;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Vector2D::new(self.x * rhs, self.y * rhs)
     }
 }

@@ -1,21 +1,27 @@
-use crate::point_2d::Point2D;
-use crate::verlet_object::VerletObject;
+use crate::verlet_object::{StartConditions, VerletObject};
 use macroquad::color::Color;
+use std::time::Duration;
 
-pub struct Ball {
-    pub verlet_object: VerletObject,
+pub struct BallCharacteristics {
     pub radius: f32,
     pub color: Color,
     pub id: u32,
 }
 
+pub struct Ball {
+    pub characteristics: BallCharacteristics,
+    pub verlet_object: VerletObject,
+}
+
 impl Ball {
-    pub fn new(id: u32, position: Point2D, radius: f32, color: Color) -> Self {
+    pub fn new(
+        ball_characteristics: BallCharacteristics,
+        start_conditions: StartConditions,
+        dt: Duration,
+    ) -> Self {
         Self {
-            verlet_object: VerletObject::new(position),
-            radius,
-            color,
-            id,
+            verlet_object: VerletObject::new(start_conditions, dt),
+            characteristics: ball_characteristics,
         }
     }
 }

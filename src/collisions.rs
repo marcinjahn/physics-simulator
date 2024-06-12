@@ -2,14 +2,14 @@ use crate::ball::Ball;
 use crate::point_2d::Point2D;
 
 pub fn calculate_postcollision_positions(
-    mut ball_1: &Ball,
-    mut ball_2: &Ball,
+    ball_1: &Ball,
+    ball_2: &Ball,
 ) -> Option<(Point2D, Point2D)> {
     let vector = ball_1
         .verlet_object
         .position_current
         .vector_to(&ball_2.verlet_object.position_current);
-    let min_distance = ball_1.radius + ball_2.radius;
+    let min_distance = ball_1.characteristics.radius + ball_2.characteristics.radius;
 
     if vector.length >= min_distance {
         return None;

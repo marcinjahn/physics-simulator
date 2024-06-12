@@ -38,7 +38,7 @@ impl ops::Add<Vector2D> for Point2D {
     fn add(self, rhs: Vector2D) -> Self {
         Self {
             x: self.x + rhs.x,
-            y: self.y + rhs.y
+            y: self.y + rhs.y,
         }
     }
 }
@@ -47,6 +47,17 @@ impl ops::Sub<Point2D> for Point2D {
     type Output = Point2D;
 
     fn sub(self, rhs: Point2D) -> Self {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
+impl ops::Sub<Vector2D> for Point2D {
+    type Output = Point2D;
+
+    fn sub(self, rhs: Vector2D) -> Self {
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,

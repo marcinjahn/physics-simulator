@@ -21,17 +21,23 @@ impl Renderer<'_> {
             draw_circle(
                 ball.verlet_object.position_current.x,
                 ball.verlet_object.position_current.y,
-                ball.radius,
-                ball.color,
+                ball.characteristics.radius,
+                ball.characteristics.color,
             );
 
             if !self.render_ball_ids {
                 return;
             }
 
-            let id_x = ball.verlet_object.position_current.x - ball.radius / 4.0;
-            let id_y = ball.verlet_object.position_current.y + ball.radius / 4.0;
-            draw_text(ball.id.to_string().as_str(), id_x, id_y, ball.radius, WHITE)
+            let id_x = ball.verlet_object.position_current.x - ball.characteristics.radius / 4.0;
+            let id_y = ball.verlet_object.position_current.y + ball.characteristics.radius / 4.0;
+            draw_text(
+                ball.characteristics.id.to_string().as_str(),
+                id_x,
+                id_y,
+                ball.characteristics.radius,
+                WHITE,
+            )
         });
     }
 }

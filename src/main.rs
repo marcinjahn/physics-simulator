@@ -2,30 +2,34 @@ mod ball;
 mod collisions;
 mod constraints;
 mod experiment;
+mod frame_limiter;
 mod point_2d;
 mod renderer;
 mod vector_2d;
 mod verlet_object;
 
-use crate::ball::Ball;
+use crate::ball::{BallCharacteristics};
 use crate::constraints::CircularConstraint;
 use crate::experiment::Experiment;
+use crate::frame_limiter::FramesLimiter;
 use crate::point_2d::Point2D;
 use crate::renderer::Renderer;
+use crate::vector_2d::Vector2D;
+use crate::verlet_object::StartConditions;
 use ::rand;
 use macroquad::prelude::*;
 use rand::{thread_rng, Rng};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::{Duration};
 
 // SETTINGS
 const FRAME_RATE: u32 = 60;
 const BALL_RADIUS: f32 = 10.;
 const MAX_BALLS_COUNT: usize = 500;
-const BALL_START_X: f32 = 600.;
-const BALL_START_Y: f32 = 400.;
-const BALL_SPAWN_DELAY_MS: u64 = 40;
+const BALL_START_X: f32 = 501.;
+const BALL_START_Y: f32 = 500.;
+const BALL_SPAWN_DELAY_MS: u64 = 50;
 
 #[macroquad::main(window_conf)]
 async fn main() {
@@ -36,7 +40,7 @@ async fn main() {
             Point2D { x: 500.0, y: 500.0 },
             300.0,
         ))),
-        4
+        4,
     )));
 
     start_spawning_balls(&mut experiment);
@@ -75,12 +79,19 @@ fn start_spawning_balls(experiment: &mut Arc<Mutex<Experiment>>) {
             {
                 let mut experiment = experiment_clone.lock().unwrap();
                 let id = experiment.balls.len();
-                experiment.balls.push(Ball::new(
-                    id as u32,
-                    ball_start_position,
-                    BALL_RADIUS,
-                    get_random_color(),
-                ));
+                let experiment_time = experiment.experiment_time;
+
+                experiment.add_ball(
+                    BallCharacteristics {
+                        radius: BALL_RADIUS,
+                        color: get_random_color(),
+                        id: id as u32,
+                    },
+                    StartConditions {
+                        position: ball_start_position,
+                        velocity: get_velocity(experiment_time),
+                    },
+                );
 
                 if experiment.balls.len() >= MAX_BALLS_COUNT {
                     break;
@@ -106,37 +117,6 @@ fn window_conf() -> Conf {
     }
 }
 
-pub struct FramesLimiter {
-    pub max_frames_per_second: u32,
-    min_frame_time_in_nanoseconds: u128,
-}
-
-impl FramesLimiter {
-    pub fn new(max_frames_per_second: u32) -> Self {
-        Self {
-            max_frames_per_second,
-            min_frame_time_in_nanoseconds: 1000_000_000 / (max_frames_per_second as u128),
-        }
-    }
-
-    pub fn control_frame(&self, mut func: impl FnMut() -> ()) {
-        let start = Instant::now();
-
-        func();
-
-        let elapsed = start.elapsed();
-
-        if elapsed.as_nanos() >= self.min_frame_time_in_nanoseconds {
-            return;
-        }
-
-        let nanos_left = self.min_frame_time_in_nanoseconds - elapsed.as_nanos();
-        thread::sleep(Duration::from_nanos(nanos_left as u64));
-
-        println!("elapsed: {}", start.elapsed().as_nanos());
-    }
-}
-
 fn get_random_color() -> Color {
     Color {
         r: thread_rng().gen_range(0.0..1.0),
@@ -144,4 +124,17 @@ fn get_random_color() -> Color {
         b: thread_rng().gen_range(0.0..1.0),
         a: 1.0,
     }
+}
+
+fn get_velocity(elapsed_time: Duration) -> Vector2D {
+    let mut asin_arg = elapsed_time.as_secs_f32() % 1.;
+    if elapsed_time.as_secs() % 2 == 0 { asin_arg = -1. + asin_arg };
+
+    // println!("{}", asin_arg);
+
+    let angle = asin_arg.asin() * 2.;
+
+    println!("{}; {}", asin_arg, angle);
+
+    Vector2D::new(angle.cos(), angle.sin()) * 1000.
 }

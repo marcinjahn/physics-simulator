@@ -29,7 +29,7 @@ impl Constraint for CircularConstraint {
         let vector_from_constraint_to_ball =
             self.center.vector_to(&ball.verlet_object.position_current);
 
-        let max_distance = self.radius - ball.radius;
+        let max_distance = self.radius - ball.characteristics.radius;
 
         if vector_from_constraint_to_ball.length <= max_distance {
             return None;

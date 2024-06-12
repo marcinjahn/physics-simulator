@@ -1,30 +1,47 @@
-use crate::ball::Ball;
+use crate::ball::{Ball, BallCharacteristics};
 use crate::collisions::calculate_postcollision_positions;
 use crate::constraints::Constraint;
 use crate::point_2d::Point2D;
+use crate::verlet_object::StartConditions;
 use std::time::Duration;
 
 pub struct Experiment {
     pub balls: Vec<Ball>,
     pub(crate) constraint: Option<Box<dyn Constraint + Send + Sync>>,
+    pub experiment_time: Duration,
     sub_steps: u8,
     step_dt: Duration,
     gravity: Point2D,
+    frame_time: Duration,
 }
 
 impl Experiment {
     pub fn new(
         frame_time: Duration,
         constraint: Option<Box<dyn Constraint + Send + Sync>>,
-        sub_steps: u8
+        sub_steps: u8,
     ) -> Self {
         Self {
             gravity: Point2D { x: 0.0, y: 1000.0 },
             balls: vec![],
             constraint,
             sub_steps,
-            step_dt: frame_time / sub_steps as u32
+            step_dt: frame_time / sub_steps as u32,
+            frame_time,
+            experiment_time: Duration::new(0, 0),
         }
+    }
+
+    pub fn add_ball(
+        &mut self,
+        ball_characteristics: BallCharacteristics,
+        start_conditions: StartConditions,
+    ) {
+        self.balls.push(Ball::new(
+            ball_characteristics,
+            start_conditions,
+            self.step_dt,
+        ))
     }
 
     pub fn update(&mut self) {
@@ -34,6 +51,8 @@ impl Experiment {
             self.handle_collisions();
             self.update_positions();
         }
+
+        self.experiment_time = self.experiment_time + self.frame_time;
     }
 
     fn update_positions(&mut self) {
