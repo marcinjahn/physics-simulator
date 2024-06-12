@@ -30,6 +30,7 @@ const MAX_BALLS_COUNT: usize = 500;
 const BALL_START_X: f32 = 501.;
 const BALL_START_Y: f32 = 500.;
 const BALL_SPAWN_DELAY_MS: u64 = 50;
+const BALL_RADIUS_RANGE: (f32, f32) = (5., 20.);
 
 #[macroquad::main(window_conf)]
 async fn main() {
@@ -83,7 +84,7 @@ fn start_spawning_balls(experiment: &mut Arc<Mutex<Experiment>>) {
 
                 experiment.add_ball(
                     BallCharacteristics {
-                        radius: BALL_RADIUS,
+                        radius: get_radius(),
                         color: get_random_color(),
                         id: id as u32,
                     },
@@ -137,4 +138,11 @@ fn get_velocity(elapsed_time: Duration) -> Vector2D {
     println!("{}; {}", asin_arg, angle);
 
     Vector2D::new(angle.cos(), angle.sin()) * 1000.
+}
+
+fn get_radius() -> f32 {
+    let random: f32 = rand::random::<u8>() as f32 / u8::MAX as f32;
+    let range = BALL_RADIUS_RANGE.1 - BALL_RADIUS_RANGE.0;
+
+    BALL_RADIUS_RANGE.0 + (random as f32 * range)
 }
