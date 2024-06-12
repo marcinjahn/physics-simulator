@@ -1,5 +1,5 @@
 use crate::experiment::Experiment;
-use macroquad::color::{BLACK, WHITE};
+use macroquad::color::{Color, BLACK, GRAY, WHITE};
 use macroquad::prelude::{clear_background, draw_circle};
 use macroquad::text::draw_text;
 
@@ -10,7 +10,12 @@ pub struct Renderer<'a> {
 
 impl Renderer<'_> {
     pub fn render(&self) {
-        clear_background(BLACK);
+        clear_background(Color {
+            r: 0.1,
+            g: 0.1,
+            b: 0.1,
+            a: 1.0,
+        });
 
         self.experiment
             .constraint

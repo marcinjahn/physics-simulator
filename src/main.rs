@@ -8,8 +8,8 @@ mod renderer;
 mod vector_2d;
 mod verlet_object;
 
-use crate::ball::{BallCharacteristics};
-use crate::constraints::CircularConstraint;
+use crate::ball::BallCharacteristics;
+use crate::constraints::{CircularConstraint, RectangularConstraint};
 use crate::experiment::Experiment;
 use crate::frame_limiter::FramesLimiter;
 use crate::point_2d::Point2D;
@@ -21,25 +21,36 @@ use macroquad::prelude::*;
 use rand::{thread_rng, Rng};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::{Duration};
+use std::time::Duration;
 
 // SETTINGS
 const FRAME_RATE: u32 = 60;
 const BALL_RADIUS: f32 = 10.;
 const MAX_BALLS_COUNT: usize = 500;
 const BALL_START_X: f32 = 501.;
-const BALL_START_Y: f32 = 500.;
+const BALL_START_Y: f32 = 400.;
 const BALL_SPAWN_DELAY_MS: u64 = 50;
 const BALL_RADIUS_RANGE: (f32, f32) = (5., 20.);
 
 #[macroquad::main(window_conf)]
 async fn main() {
     let frames_controller = FramesLimiter::new(FRAME_RATE);
+    // let mut experiment = Arc::new(Mutex::new(Experiment::new(
+    //     Duration::from_secs_f32(1. / FRAME_RATE as f32),
+    //     Some(Box::new(CircularConstraint::new(
+    //         Point2D { x: 500.0, y: 500.0 },
+    //         300.0,
+    //     ))),
+    //     4,
+    // )));
+
+
     let mut experiment = Arc::new(Mutex::new(Experiment::new(
         Duration::from_secs_f32(1. / FRAME_RATE as f32),
-        Some(Box::new(CircularConstraint::new(
-            Point2D { x: 500.0, y: 500.0 },
-            300.0,
+        Some(Box::new(RectangularConstraint::new(
+            Point2D { x: 100.0, y: 100.0 },
+            700.0,
+            500.0
         ))),
         4,
     )));
@@ -129,7 +140,9 @@ fn get_random_color() -> Color {
 
 fn get_velocity(elapsed_time: Duration) -> Vector2D {
     let mut asin_arg = elapsed_time.as_secs_f32() % 1.;
-    if elapsed_time.as_secs() % 2 == 0 { asin_arg = -1. + asin_arg };
+    if elapsed_time.as_secs() % 2 == 0 {
+        asin_arg = -1. + asin_arg
+    };
 
     // println!("{}", asin_arg);
 
