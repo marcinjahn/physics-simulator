@@ -6,34 +6,39 @@ use std::time::Duration;
 
 pub struct Experiment {
     pub balls: Vec<Ball>,
-    gravity: Point2D,
-    frame_time: Duration,
     pub(crate) constraint: Option<Box<dyn Constraint + Send + Sync>>,
+    sub_steps: u8,
+    step_dt: Duration,
+    gravity: Point2D,
 }
 
 impl Experiment {
     pub fn new(
         frame_time: Duration,
         constraint: Option<Box<dyn Constraint + Send + Sync>>,
+        sub_steps: u8
     ) -> Self {
         Self {
             gravity: Point2D { x: 0.0, y: 1000.0 },
             balls: vec![],
-            frame_time,
             constraint,
+            sub_steps,
+            step_dt: frame_time / sub_steps as u32
         }
     }
 
     pub fn update(&mut self) {
-        self.apply_gravity();
-        self.apply_constraint();
-        self.handle_collisions();
-        self.update_positions();
+        for _ in 0..self.sub_steps {
+            self.apply_gravity();
+            self.apply_constraint();
+            self.handle_collisions();
+            self.update_positions();
+        }
     }
 
     fn update_positions(&mut self) {
         self.balls.iter_mut().for_each(|ball| {
-            ball.verlet_object.update_position(self.frame_time);
+            ball.verlet_object.update_position(self.step_dt);
         })
     }
 

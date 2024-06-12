@@ -23,9 +23,9 @@ use std::time::{Duration, Instant};
 const FRAME_RATE: u32 = 60;
 const BALL_RADIUS: f32 = 10.;
 const MAX_BALLS_COUNT: usize = 500;
-const BALL_START_X: f32 = 700.;
+const BALL_START_X: f32 = 600.;
 const BALL_START_Y: f32 = 400.;
-const BALL_SPAWN_DELAY_MS: u64 = 50;
+const BALL_SPAWN_DELAY_MS: u64 = 40;
 
 #[macroquad::main(window_conf)]
 async fn main() {
@@ -36,6 +36,7 @@ async fn main() {
             Point2D { x: 500.0, y: 500.0 },
             300.0,
         ))),
+        4
     )));
 
     start_spawning_balls(&mut experiment);
