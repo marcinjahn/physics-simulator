@@ -7,6 +7,7 @@ mod point_2d;
 mod renderer;
 mod vector_2d;
 mod verlet_object;
+mod grid;
 
 use crate::ball::BallCharacteristics;
 use crate::constraints::{CircularConstraint, RectangularConstraint};
